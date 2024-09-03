@@ -20,6 +20,8 @@ public:
     ~hstring();
 // Simple Pattern Matching Algorithm
     int Index(const hstring & st);
+// Method of modifying hstring
+    bool modify(const hstring & stp, const hstring & stl);
 // overloaded operator methods
     hstring & operator=(const hstring & st);
     hstring & operator=(const char* s);
