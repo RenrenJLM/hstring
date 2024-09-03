@@ -21,7 +21,6 @@ hstring::hstring()
     len = 0;
     buffer = nullptr;
     buflen = 0;
-    nextval = nullptr;
 }
 
 hstring::hstring(const char* s)
@@ -31,9 +30,6 @@ hstring::hstring(const char* s)
     str = new(buffer) char[len+1];
     memcpy(str, s, len+1);
     buflen = len + 1;
-    nextval = new(buffer + buflen) int[len];
-    buflen += len * sizeof(int);
-    get_nextval(*this);
 }
 
 hstring::hstring(const hstring & st)
@@ -43,9 +39,6 @@ hstring::hstring(const hstring & st)
     str = new(buffer) char[len+1];
     memcpy(str, st.str, len+1);
     buflen = len + 1;
-    nextval = new(buffer + buflen) int[len];
-    buflen += len * sizeof(int);
-    get_nextval(*this);
 }
 
 hstring::~hstring()
@@ -53,32 +46,8 @@ hstring::~hstring()
     delete [] buffer;
 }
 
-// KMP matching algorithm
-void get_nextval(const hstring & st)
-{
-    st.nextval[0] = -1;  // 与经典next数组的区别，nextval[0]总是设为-1
-    int j = 0;           // 模式串的指针
-    int k = -1;          // 辅助指针，用来记录前缀与后缀相同的最大长度
-
-    while (j < st.len - 1) {
-        if (k == -1 || st.str[j] == st.str[k]) {
-            j++;
-            k++;
-            if (st.str[j] != st.str[k]) {
-                st.nextval[j] = k;
-            } else {
-                // 优化：如果当前字符与前一个最长匹配的字符相等
-                // 则跳过当前字符，直接使用前一个最长匹配的nextval值
-                st.nextval[j] = st.nextval[k];
-            }
-        } else {
-            // 递归寻找最长可匹配前缀
-            k = st.nextval[k];
-        }
-    }
-}
-
-int hstring::Index_KMP(const hstring & st)const
+// Simple Pattern Matching Algorithm
+int Index(const hstring & st)
 {
 
 }
@@ -93,9 +62,6 @@ hstring & hstring::operator=(const hstring & st)
     str = new(buffer) char[len+1];
     memcpy(str, st.str, len+1);
     buflen = len + 1;
-    nextval = new(buffer + buflen) int[len];
-    memcpy(nextval, st.nextval, len);
-    buflen += len * sizeof(int);
     return *this;
 }
 
@@ -106,9 +72,6 @@ hstring & hstring::operator=(const char* s)
     str = new(buffer) char[len+1];
     memcpy(str, s, len+1);
     buflen = len + 1;
-    nextval = new(buffer + buflen) int[len];
-    get_nextval(*this);
-    buflen += len * sizeof(int);
     return *this;
 }
 
@@ -132,11 +95,8 @@ hstring & hstring::operator=(const int n)
         l = l/10;
     }
     str[len] = '\0';
-// 更新 buflen 和 nextval
+// 更新 buflen
     buflen = len + 1;
-    nextval = new(buffer + buflen) int[len];
-    get_nextval(*this);
-    buflen += len * sizeof(int);
     return *this;
 }
 
@@ -150,22 +110,23 @@ const char & hstring::operator[](int i)const
     return str[i];
 }
 
-hstring hstring::operator+(const hstring & st)
+hstring & hstring::operator+(const hstring & st)
 {
     buflen = 0;
     str = new(buffer) char[len+st.len+1];
     memcpy(str+len, st.str, st.len+1);
     len += st.len;
     buflen = len + 1;
-    nextval = new(buffer + buflen) int[len];
-    get_nextval(*this);
-    buflen += len * sizeof(int);
     return *this;
 }
 
-hstring hstring::operator-(const hstring & st)
+hstring & hstring::operator-(const hstring & st)
 {
-    Index_KMP(st);
+    if(Index(st)==-1)
+    {
+        cout << "没有匹配的字符串，删除失败！" << std::endl;
+        return *this;
+    }
 }
 
 // overloaded operator friends
