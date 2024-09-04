@@ -81,13 +81,35 @@ bool hstring::modify(const hstring & stp, const hstring & stl)
         cout << "没有匹配的字符串，修改失败！" << endl;
         return false;
     }
-    len = len-stp.len+stl.len;
-    str = new(buffer+buflen) char[len+1];
-    buflen += len+1;
-    memcpy(str, buffer, pos);
-    memcpy(str+pos, stl.str, stl.len);
-    memcpy(str+pos+stl.len, buffer+pos+stp.len, len-pos-stl.len+1);
-    return true;
+
+    if(BUF>=buflen+len-stp.len+stl.len+1)
+    {
+        len = len-stp.len+stl.len;
+        char* str_pre = str;
+        str = new(buffer+buflen) char[len+1];
+        buflen += len+1;
+        memcpy(str, str_pre, pos);
+        memcpy(str+pos, stl.str, stl.len);
+        memcpy(str+pos+stl.len, str_pre+pos+stp.len, len-pos-stl.len+1);
+        return true;
+    }
+    else
+    {
+        buflen = 0;
+        int BUFL = len-stp.len+stl.len+1;
+        char s[len+1];
+        memcpy(s, str, len+1);
+        delete [] buffer;
+        buffer = new char [BUFL];
+        str = new(buffer) char[BUFL];
+        memcpy(str, s, pos);
+        memcpy(str+pos, stl.str, stl.len);
+        memcpy(str+pos+stl.len, s+pos+stp.len, BUFL-pos-stl.len);
+        len = len-stp.len+stl.len;
+        buflen = len+1;
+        return true;
+    }
+
 }
 
 // overloaded operator methods
@@ -150,11 +172,30 @@ const char & hstring::operator[](int i)const
 
 hstring & hstring::operator+(const hstring & st)
 {
-    str = new(buffer+buflen-len-1) char[len+st.len+1];
-    memcpy(str+len, st.str, st.len+1);
-    len += st.len;
-    buflen += st.len;
-    return *this;
+    if(BUF>=buflen-(len+1)+len+st.len+1)    // 即 BUF>=buflen+st.len
+    {
+        str = new(buffer+buflen-len-1) char[len+st.len+1];
+        memcpy(str+len, st.str, st.len+1);
+        len += st.len;
+        buflen += st.len;
+        return *this;
+    }
+    else        // 此时超出缓冲区大小，重新分配内存给缓冲区 buffer
+    {
+        buflen = 0;
+        int BUFL = len+st.len+1;
+        char s[len+1];
+        memcpy(s, str, len+1);
+        delete [] buffer;
+        buffer = new char[BUFL];
+        str = new(buffer) char[BUFL];
+        memcpy(str, s, len+1);
+        memcpy(str+len, st.str, st.len+1);
+        len += st.len;
+        buflen = len+1;
+        return *this;
+    }
+
 }
 
 hstring & hstring::operator-(const hstring & st)

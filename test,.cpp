@@ -19,9 +19,13 @@ int main()
          << "stl = " << stl << endl 
          << "stu = " << stu << endl << endl;
     
-    cout << "str1.Index(stp) = " << str1.Index(stp) << endl;
+    if(str1.Index(stp)!=-1)
+          cout << "str1.Index(stp) = " << str1.Index(stp) << endl;
     if(str1.Index(stu)!=-1)
           cout << "str1.Index(stu) = " << str1.Index(stu) << endl << endl;
+    if(str1.modify(stp, stl))
+          cout << "str1.modify(stp, stl) 修改成功！" << endl
+               << "str1 = " << str1 << endl;
     if(str1.modify(stp, stl))
           cout << "str1.modify(stp, stl) 修改成功！" << endl
                << "str1 = " << str1 << endl;

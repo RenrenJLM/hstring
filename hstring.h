@@ -9,7 +9,7 @@ class hstring
 private:
     char* str;
     int len;
-    static const int BUF = 64;
+    static const int BUF = 10;
     char* buffer;
     int buflen;
 public:
