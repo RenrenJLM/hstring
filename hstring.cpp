@@ -129,7 +129,7 @@ hstring & hstring::operator=(const int n)
     l = n;
     for(int i=len-1; i>=0; i--)
     {
-        str[i] = l%10;
+        str[i] = '0' + l%10;        // 将数字转换为对应字符
         l = l/10;
     }
     str[len] = '\0';
@@ -150,11 +150,10 @@ const char & hstring::operator[](int i)const
 
 hstring & hstring::operator+(const hstring & st)
 {
-    buflen = 0;
-    str = new(buffer) char[len+st.len+1];
+    str = new(buffer+buflen-len-1) char[len+st.len+1];
     memcpy(str+len, st.str, st.len+1);
     len += st.len;
-    buflen = len + 1;
+    buflen += st.len;
     return *this;
 }
 

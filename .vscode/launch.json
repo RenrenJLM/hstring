@@ -9,8 +9,8 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${fileDirname}\\${fileBasenameNoExtension}.exe",      // 当前文件的可执行文件的文件路径 
-            "args": [],
-            "stopAtEntry": false,
+            "args": [],                 // 程序启动参数
+            "stopAtEntry": true,        // 在程序入口处停止
             "cwd": "${fileDirname}",
             "environment": [],
             "externalConsole": false,
