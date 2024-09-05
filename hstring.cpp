@@ -97,16 +97,19 @@ bool hstring::modify(const hstring & stp, const hstring & stl)
     {
         buflen = 0;
         int BUFL = len-stp.len+stl.len+1;
-        char s[len+1];
-        memcpy(s, str, len+1);
-        delete [] buffer;
+        // char s[len+1];
+        // memcpy(s, str, len+1);
+        char* buffer_pre = buffer;
+        char* str_pre = str;
+        // delete [] buffer;
         buffer = new char [BUFL];
         str = new(buffer) char[BUFL];
-        memcpy(str, s, pos);
+        memcpy(str, str_pre, pos);
         memcpy(str+pos, stl.str, stl.len);
-        memcpy(str+pos+stl.len, s+pos+stp.len, BUFL-pos-stl.len);
+        memcpy(str+pos+stl.len, str_pre+pos+stp.len, BUFL-pos-stl.len);
         len = len-stp.len+stl.len;
         buflen = len+1;
+        delete [] buffer_pre;
         return true;
     }
 
@@ -236,15 +239,18 @@ hstring & hstring::operator+(const hstring & st)
     {
         buflen = 0;
         int BUFL = len+st.len+1;
-        char s[len+1];
-        memcpy(s, str, len+1);
-        delete [] buffer;
+        // char s[len+1];
+        // memcpy(s, str, len+1);
+        // delete [] buffer;
+        char* buffer_pre = buffer;
+        char* str_pre = str;
         buffer = new char[BUFL];
         str = new(buffer) char[BUFL];
-        memcpy(str, s, len+1);
+        memcpy(str, str_pre, len+1);
         memcpy(str+len, st.str, st.len+1);
         len += st.len;
         buflen = len+1;
+        delete [] buffer_pre;
         return *this;
     }
 
@@ -263,6 +269,16 @@ hstring & hstring::operator-(const hstring & st)
     memcpy(str+pos, str+pos+st.len, len-pos+1);
     buflen = len+1;
     return *this;
+}
+
+hstring & hstring::operator+=(const hstring & st)
+{
+    return *this+st;
+}
+
+hstring & hstring::operator-=(const hstring & st)
+{
+    return *this-st;
 }
 
 // overloaded operator friends

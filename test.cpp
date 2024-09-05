@@ -64,6 +64,19 @@ int main()
     str3.Index("34");
     cout << endl;
 
+// 测试 += 与 -=
+   hstring str4 = "123456789", str5 = "abc", str6 = "345";
+   cout << "str4 = " << str4 << endl
+        << "str5 = " << str5 << endl
+        << "str6 = " << str6 << endl;
+   str4 += str5;
+   cout << "'str4 += str5'" << endl
+        << "str4 = " << str4 << endl;
+   str4 -= str6;
+   cout << "'str4 -= str6'" << endl
+        << "str4 = " << str4 << endl << endl;
+
+
 // 测试从 cin 输入 hstring 对象
     hstring str_cin1, str_cin2;
     cout << "测试从 cin 输入 hstring 对象" << endl

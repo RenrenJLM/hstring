@@ -30,6 +30,8 @@ public:
     const char & operator[](int i)const;
     hstring & operator+(const hstring & st);
     hstring & operator-(const hstring & st);
+    hstring & operator+=(const hstring & st);
+    hstring & operator-=(const hstring & st);
 // overloaded operator friends
     friend ostream & operator<<(ostream & os, const hstring & st);
     friend istream & operator>>(istream & is, hstring & st);
