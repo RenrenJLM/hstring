@@ -48,7 +48,7 @@ hstring::~hstring()
 }
 
 // Simple Pattern Matching Algorithm
-int hstring::Index(const hstring & st)
+int hstring::Index(const hstring & st)const
 {
     int i=0, j=0;
     while(i<=len-1 && j<=st.len-1)
@@ -117,22 +117,52 @@ hstring & hstring::operator=(const hstring & st)
 {
     if (this == &st)
         return *this;
-    buflen = 0;
-    len = st.len;
-    str = new(buffer) char[len+1];
-    memcpy(str, st.str, len+1);
-    buflen = len + 1;
-    return *this;
+    
+    if(BUF>=st.len+1)
+    {
+        buflen = 0;
+        len = st.len;
+        str = new(buffer) char[len+1];
+        memcpy(str, st.str, len+1);
+        buflen = len + 1;
+        return *this;
+    }
+    else
+    {
+        int BUFL = st.len+1;
+        buflen = 0;
+        len = st.len;
+        delete [] buffer;
+        buffer = new char [BUFL];
+        str = new(buffer) char[BUFL];
+        memcpy(str, st.str, st.len+1);
+        buflen = len+1;
+        return *this;
+    }
 }
 
 hstring & hstring::operator=(const char* s)
 {
-    buflen = 0;
     len = hstrlen(s);
-    str = new(buffer) char[len+1];
-    memcpy(str, s, len+1);
-    buflen = len + 1;
-    return *this;
+    if(BUF>=len+1)
+    {
+        buflen = 0;
+        str = new(buffer) char[len+1];
+        memcpy(str, s, len+1);
+        buflen = len + 1;
+        return *this;
+    }
+    else
+    {
+        int BUFL = len+1;
+        buflen = 0;
+        delete [] buffer;
+        buffer = new char[BUFL];
+        str = new(buffer) char[BUFL];
+        memcpy(str, s, len+1);
+        buflen = len+1;
+        return *this;
+    }
 }
 
 hstring & hstring::operator=(const int n)
@@ -146,18 +176,40 @@ hstring & hstring::operator=(const int n)
         len++;
         l = l/10;
     }
-// 存入 str 中
-    str = new(buffer) char[len+1];
-    l = n;
-    for(int i=len-1; i>=0; i--)
+
+    if(BUF>=len+1)
     {
-        str[i] = '0' + l%10;        // 将数字转换为对应字符
-        l = l/10;
+    // 存入 str 中
+        str = new(buffer) char[len+1];
+        l = n;
+        for(int i=len-1; i>=0; i--)
+        {
+            str[i] = '0' + l%10;        // 将数字转换为对应字符
+            l = l/10;
+        }
+        str[len] = '\0';
+    // 更新 buflen
+        buflen = len + 1;
+        return *this;
     }
-    str[len] = '\0';
-// 更新 buflen
-    buflen = len + 1;
-    return *this;
+    else
+    {
+        int BUFL = len+1;
+        delete [] buffer;
+        buffer = new char[BUFL];
+        str = new(buffer) char[BUFL];
+    // 存入 str 中
+        l = n;
+        for(int i=len-1; i>=0; i--)
+        {
+            str[i] = '0' + l%10;        // 将数字转换为对应字符
+            l = l/10;
+        }
+        str[len] = '\0';
+    // 更新 buflen
+        buflen = len + 1;
+        return *this;
+    }
 }
 
 char & hstring::operator[](int i)
@@ -165,7 +217,7 @@ char & hstring::operator[](int i)
     return str[i];
 }
 
-const char & hstring::operator[](int i)const
+const char & hstring::operator[](int i)const        // 对于 const 对象的 [] 重载
 {
     return str[i];
 }
@@ -226,7 +278,13 @@ istream & operator>>(istream & is, hstring & st)
     is.get(temp, hstring::BUF);
     if(is)
         st = temp;
-    while(is && is.get()!='\0')
+    while(is && is.get()!='\n')
         continue;
     return is;
+}
+
+// other method
+const int hstring::get_len()const
+{
+    return this->len;
 }

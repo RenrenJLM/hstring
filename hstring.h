@@ -19,7 +19,7 @@ public:
     hstring(const hstring & st);
     ~hstring();
 // Simple Pattern Matching Algorithm
-    int Index(const hstring & st);
+    int Index(const hstring & st)const;
 // Method of modifying hstring
     bool modify(const hstring & stp, const hstring & stl);
 // overloaded operator methods
@@ -33,6 +33,8 @@ public:
 // overloaded operator friends
     friend ostream & operator<<(ostream & os, const hstring & st);
     friend istream & operator>>(istream & is, hstring & st);
+// other method
+    const int get_len()const;
 };
 
 #endif
