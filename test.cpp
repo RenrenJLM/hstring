@@ -52,7 +52,7 @@ int main()
     cout << "修改失败的情况：再次调用 str2.modify(pattern_st1, pattern_st2) " << endl
          << "'str2.modify(pattern_st1, pattern_st2);'" << endl;
     str2.modify(pattern_st1, pattern_st2);
-    cout << "此时，str2 = " << str2 << str2.get_len() << endl << endl;
+    cout << "此时，str2 = " << str2 << ", str2.len = " << str2.get_len() << endl << endl;
 
 // 测试查数据
     cout << "利用 Index() 方法查数据：" << endl
