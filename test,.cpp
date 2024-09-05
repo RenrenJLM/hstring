@@ -65,11 +65,17 @@ int main()
     cout << endl;
 
 // 测试从 cin 输入 hstring 对象
-    hstring str_cin;
-    cout << "'hstring str_cin;'" << endl
-         << "请输入一个 hstring 对象：(最多读取 BUF-1 个字符)" << endl;
-    cin >> str_cin;
-    cout << "str_cin = " << str_cin << ", str_cin.len = " << str_cin.get_len() << endl;
+    hstring str_cin1, str_cin2;
+    cout << "测试从 cin 输入 hstring 对象" << endl
+         << "'hstring str_cin1;'" << endl
+         << "请输入一个 hstring 对象给 str_cin1 ：(最多读取 BUF-1 个字符)" << endl;
+    cin >> str_cin1;
+    cout << "str_cin1 = " << str_cin1 << ", str_cin1.len = " << str_cin1.get_len() << endl << endl;
+
+    cout << "'hstring str_cin2;'" << endl
+         << "请输入一个 hstring 对象给 str_cin2 ：(最多读取 BUF-1 个字符)" << endl;
+    cin >> str_cin2;
+    cout << "str_cin2 = " << str_cin2 << ", str_cin2.len = " << str_cin2.get_len() << endl;
 
     return 0;
 }
