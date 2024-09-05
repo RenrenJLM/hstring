@@ -1,11 +1,8 @@
 #include <iostream>
 #include <cstring>
-#include <new>
 #include "hstring.h"
-using std::cin;
-using std::cout;
-using std::endl;
 size_t hstrlen(const char* s);
+void hstrmemmove(char* dest, size_t len, int n);
 
 size_t hstrlen(const char* s)
 {
@@ -15,31 +12,31 @@ size_t hstrlen(const char* s)
     return len;
 }
 
-// constructors
-hstring::hstring()
+void hstrmemmove(char* dest, size_t len, int n)
 {
-    buffer = new char[BUF];
-    len = 0;
-    str = nullptr;
-    buflen = 0;
+    if(n>0)
+        for(int i=len-1; i>=0; i--){dest[i+n]=dest[i];};
+    if(n<0)
+        for(int i=0; i<=len-1; i++){dest[n+i]=dest[i];};
 }
+
+// constructors
+hstring::hstring():buffer(nullptr),capacity(0),length(0){}
 
 hstring::hstring(const char* s)
 {
-    buffer = new char[BUF];
-    len = hstrlen(s);
-    str = new(buffer) char[len+1];
-    memcpy(str, s, len+1);
-    buflen = len + 1;
+    length = hstrlen(s);
+    capacity = length+1;
+    buffer = new char[capacity];
+    memcpy(buffer, s, length+1);
 }
 
 hstring::hstring(const hstring & st)
 {
-    buffer = new char[BUF];
-    len = st.len;
-    str = new(buffer) char[len+1];
-    memcpy(str, st.str, len+1);
-    buflen = len + 1;
+    length = st.length;
+    capacity = length+1;
+    buffer = new char[capacity];
+    memcpy(buffer, st.buffer, length+1);
 }
 
 hstring::~hstring()
@@ -51,9 +48,9 @@ hstring::~hstring()
 int hstring::Index(const hstring & st)const
 {
     int i=0, j=0;
-    while(i<=len-1 && j<=st.len-1)
+    while(i<=length-1 && j<=st.length-1)
     {
-        if(str[i]==st.str[j])
+        if(buffer[i]==st.buffer[j])
         {
             ++i; ++j;
         }
@@ -63,11 +60,11 @@ int hstring::Index(const hstring & st)const
             j=0;
         }
     }
-    if(j==st.len)
-        return i-st.len;
+    if(j==st.length)
+        return i-st.length;
     else 
     {
-        cout << "没有匹配的字符串，查找失败！" << endl;
+        std::cout << "没有匹配的字符串，查找失败！" << std::endl;
         return -1;
     }
 }
@@ -78,41 +75,32 @@ bool hstring::modify(const hstring & stp, const hstring & stl)
     int pos = Index(stp);
     if(pos==-1)
     {
-        cout << "没有匹配的字符串，修改失败！" << endl;
+        std::cout << "没有匹配的字符串，修改失败！" << std::endl;
         return false;
     }
 
-    if(BUF>=buflen+len-stp.len+stl.len+1)
-    {
-        len = len-stp.len+stl.len;
-        char* str_pre = str;
-        str = new(buffer+buflen) char[len+1];
-        buflen += len+1;
-        memcpy(str, str_pre, pos);
-        memcpy(str+pos, stl.str, stl.len);
-        memcpy(str+pos+stl.len, str_pre+pos+stp.len, len-pos-stl.len+1);
-        return true;
-    }
-    else
-    {
-        buflen = 0;
-        int BUFL = len-stp.len+stl.len+1;
-        // char s[len+1];
-        // memcpy(s, str, len+1);
-        char* buffer_pre = buffer;
-        char* str_pre = str;
-        // delete [] buffer;
-        buffer = new char [BUFL];
-        str = new(buffer) char[BUFL];
-        memcpy(str, str_pre, pos);
-        memcpy(str+pos, stl.str, stl.len);
-        memcpy(str+pos+stl.len, str_pre+pos+stp.len, BUFL-pos-stl.len);
-        len = len-stp.len+stl.len;
-        buflen = len+1;
-        delete [] buffer_pre;
-        return true;
-    }
+    if(capacity < length-stp.length+stl.length+1)
+        expend(length-stp.length+stl.length+1);
 
+    hstrmemmove(buffer+pos+stp.length, length-pos-stp.length+1, stl.length-stp.length);
+    memcpy(buffer+pos, stl.buffer, stl.length);
+    length = length-stp.length+stl.length;
+    return true;
+    // if(capacity >= length-stp.length+stl.length+1)
+    // {
+    //     hstrmemmove(buffer+pos+stp.length, length-pos-stp.length+1, stl.length-stp.length);
+    //     memcpy(buffer+pos, stl.buffer, stl.length);
+    //     length = length-stp.length+stl.length;
+    //     return true;
+    // }
+    // else
+    // {
+    //     expend(length-stp.length+stl.length+1);
+    //     hstrmemmove(buffer+pos+stp.length, length-pos-stp.length+1, stl.length-stp.length);
+    //     memcpy(buffer+pos, stl.buffer, stl.length);
+    //     length = length-stp.length+stl.length;
+    //     return true;
+    // }
 }
 
 // overloaded operator methods
@@ -120,187 +108,132 @@ hstring & hstring::operator=(const hstring & st)
 {
     if (this == &st)
         return *this;
+
+    if(capacity < st.length+1)
+        expend(st.length+1);
     
-    if(BUF>=st.len+1)
-    {
-        buflen = 0;
-        len = st.len;
-        str = new(buffer) char[len+1];
-        memcpy(str, st.str, len+1);
-        buflen = len + 1;
-        return *this;
-    }
-    else
-    {
-        int BUFL = st.len+1;
-        buflen = 0;
-        len = st.len;
-        delete [] buffer;
-        buffer = new char [BUFL];
-        str = new(buffer) char[BUFL];
-        memcpy(str, st.str, st.len+1);
-        buflen = len+1;
-        return *this;
-    }
+    memcpy(buffer, st.buffer, st.length+1);
+    length = st.length;
+    return *this;
+    // if(capacity>=st.length+1)
+    // {
+    //     memcpy(buffer, st.buffer, st.length+1);
+    //     length = st.length;
+    //     return *this;
+    // }
+    // else
+    // {
+    //     expend(st.length+1);
+    //     memcpy(buffer, st.buffer, st.length+1);
+    //     length = st.length;
+    //     return *this;
+    // }
 }
 
 hstring & hstring::operator=(const char* s)
 {
-    len = hstrlen(s);
-    if(BUF>=len+1)
-    {
-        buflen = 0;
-        str = new(buffer) char[len+1];
-        memcpy(str, s, len+1);
-        buflen = len + 1;
-        return *this;
-    }
-    else
-    {
-        int BUFL = len+1;
-        buflen = 0;
-        delete [] buffer;
-        buffer = new char[BUFL];
-        str = new(buffer) char[BUFL];
-        memcpy(str, s, len+1);
-        buflen = len+1;
-        return *this;
-    }
+    int s_len = hstrlen(s);
+    if(capacity < s_len+1)
+        expend(s_len+1);
+        
+    memcpy(buffer, s, s_len+1);
+    length = s_len;
+    return *this;
+    // if(capacity>=s_len+1)
+    // {
+    //     memcpy(buffer, s, s_len+1);
+    //     length = s_len;
+    //     return *this;
+    // }
+    // else
+    // {
+    //     expend(s_len+1);
+    //     memcpy(buffer, s, s_len+1);
+    //     length = s_len;
+    //     return *this;
+    // }
 }
 
 hstring & hstring::operator=(const int n)
 {
-    buflen = 0;
-// 计算 len
-    len = 1;
+// 计算 nlen
+    int nlen = 1;
     int l = n/10;
     while(l)
     {
-        len++;
+        nlen++;
         l = l/10;
     }
 
-    if(BUF>=len+1)
+    if(capacity<nlen+1)
+        expend(nlen+1);
+// 将数据填入 buffer 为起点的内存中
+    l = n;
+    for(int i=nlen-1; i>=0; i--)
     {
-    // 存入 str 中
-        str = new(buffer) char[len+1];
-        l = n;
-        for(int i=len-1; i>=0; i--)
-        {
-            str[i] = '0' + l%10;        // 将数字转换为对应字符
-            l = l/10;
-        }
-        str[len] = '\0';
-    // 更新 buflen
-        buflen = len + 1;
-        return *this;
+        buffer[i] = '0' + l%10;     // 将数字转换为对应字符
+        l = l/10;
     }
-    else
-    {
-        int BUFL = len+1;
-        delete [] buffer;
-        buffer = new char[BUFL];
-        str = new(buffer) char[BUFL];
-    // 存入 str 中
-        l = n;
-        for(int i=len-1; i>=0; i--)
-        {
-            str[i] = '0' + l%10;        // 将数字转换为对应字符
-            l = l/10;
-        }
-        str[len] = '\0';
-    // 更新 buflen
-        buflen = len + 1;
-        return *this;
-    }
+    buffer[nlen] = '\0';
+    length = nlen;
+    return *this;
 }
 
 char & hstring::operator[](int i)
 {
-    return str[i];
+    return buffer[i];
 }
 
 const char & hstring::operator[](int i)const        // 对于 const 对象的 [] 重载
 {
-    return str[i];
+    return buffer[i];
 }
 
-hstring & hstring::operator+(const hstring & st)
+hstring hstring::operator+(const hstring & st)
 {
-    if(BUF>=buflen-(len+1)+len+st.len+1)    // 即 BUF>=buflen+st.len
-    {
-        str = new(buffer+buflen-len-1) char[len+st.len+1];
-        memcpy(str+len, st.str, st.len+1);
-        len += st.len;
-        buflen += st.len;
-        return *this;
-    }
-    else        // 此时超出缓冲区大小，重新分配内存给缓冲区 buffer
-    {
-        buflen = 0;
-        int BUFL = len+st.len+1;
-        // char s[len+1];
-        // memcpy(s, str, len+1);
-        // delete [] buffer;
-        char* buffer_pre = buffer;
-        char* str_pre = str;
-        buffer = new char[BUFL];
-        str = new(buffer) char[BUFL];
-        memcpy(str, str_pre, len+1);
-        memcpy(str+len, st.str, st.len+1);
-        len += st.len;
-        buflen = len+1;
-        delete [] buffer_pre;
-        return *this;
-    }
-
+    hstring temp;
+    temp.expend(length+st.length+1);
+    memcpy(temp.buffer, buffer, length);
+    memcpy(temp.buffer+length, st.buffer, st.length+1);
+    temp.length = length+st.length;
+    return temp;
 }
 
-hstring & hstring::operator-(const hstring & st)
+hstring hstring::operator-(const hstring & st)
 {
     int pos = Index(st);
     if(pos==-1)
     {
-        cout << "没有匹配的字符串，删除失败！" << endl;
+        std::cout << "没有匹配的字符串，删除失败！" << std::endl;
         return *this;
     }
-    len = len-st.len;
-    str = new(buffer) char[len+1];
-    memcpy(str+pos, str+pos+st.len, len-pos+1);
-    buflen = len+1;
-    return *this;
+    hstring temp = *this;
+    hstrmemmove(temp.buffer+pos+st.length, temp.length-pos-st.length+1, -st.length);
+    temp.length = temp.length-st.length;
+    return temp;
 }
 
 hstring & hstring::operator+=(const hstring & st)
 {
-    return *this+st;
+    *this = *this + st;
+    return *this;
 }
 
 hstring & hstring::operator-=(const hstring & st)
 {
-    return *this-st;
+    *this = *this - st;
+    return *this;
 }
 
 // overloaded operator friends
-ostream & operator<<(ostream & os, const hstring & st)
+std::ostream & operator<<(std::ostream & os, const hstring & st)
 {
-    os << st.str;
+    os << st.buffer;
     return os;
-}
-
-istream & operator>>(istream & is, hstring & st)
-{
-    char temp[hstring::BUF];
-    is.get(temp, hstring::BUF);
-    if(is)
-        st = temp;
-    while(is && is.get()!='\n')
-        continue;
-    return is;
 }
 
 // other method
 const int hstring::get_len()const
 {
-    return this->len;
+    return this->length;
 }
