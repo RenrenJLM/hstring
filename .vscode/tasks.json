@@ -2,7 +2,7 @@
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "g++ 单文件任务",      // 任务名称
+            "label": "g++ 单文件任务",      // 任务名称 
             "command": "C:\\Program Files\\mingw64\\bin\\g++.exe",
             "args": [
                 "-fdiagnostics-color=always",

@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) 当前可执行文件调试",     // 配置名称
+            "name": "(gdb) 当前可执行文件调试",     // 配置名称 
             "type": "cppdbg",
             "request": "launch",
             "program": "${fileDirname}\\${fileBasenameNoExtension}.exe",      // 当前文件的可执行文件的文件路径 

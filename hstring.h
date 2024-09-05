@@ -8,7 +8,7 @@ private:
     char* buffer;
     int capacity;
     int length;
-// 扩展缓冲区 buffer, 并将原数据复制到新缓冲区中，不改变 length
+// 扩展缓冲区 buffer, 并将原数据复制到新缓冲区中，不改变 length 
     void expend(size_t new_capacity)
     {
         char* new_buffer = new char[new_capacity];

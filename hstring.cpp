@@ -86,21 +86,6 @@ bool hstring::modify(const hstring & stp, const hstring & stl)
     memcpy(buffer+pos, stl.buffer, stl.length);
     length = length-stp.length+stl.length;
     return true;
-    // if(capacity >= length-stp.length+stl.length+1)
-    // {
-    //     hstrmemmove(buffer+pos+stp.length, length-pos-stp.length+1, stl.length-stp.length);
-    //     memcpy(buffer+pos, stl.buffer, stl.length);
-    //     length = length-stp.length+stl.length;
-    //     return true;
-    // }
-    // else
-    // {
-    //     expend(length-stp.length+stl.length+1);
-    //     hstrmemmove(buffer+pos+stp.length, length-pos-stp.length+1, stl.length-stp.length);
-    //     memcpy(buffer+pos, stl.buffer, stl.length);
-    //     length = length-stp.length+stl.length;
-    //     return true;
-    // }
 }
 
 // overloaded operator methods
@@ -115,19 +100,6 @@ hstring & hstring::operator=(const hstring & st)
     memcpy(buffer, st.buffer, st.length+1);
     length = st.length;
     return *this;
-    // if(capacity>=st.length+1)
-    // {
-    //     memcpy(buffer, st.buffer, st.length+1);
-    //     length = st.length;
-    //     return *this;
-    // }
-    // else
-    // {
-    //     expend(st.length+1);
-    //     memcpy(buffer, st.buffer, st.length+1);
-    //     length = st.length;
-    //     return *this;
-    // }
 }
 
 hstring & hstring::operator=(const char* s)
@@ -135,23 +107,10 @@ hstring & hstring::operator=(const char* s)
     int s_len = hstrlen(s);
     if(capacity < s_len+1)
         expend(s_len+1);
-        
+
     memcpy(buffer, s, s_len+1);
     length = s_len;
     return *this;
-    // if(capacity>=s_len+1)
-    // {
-    //     memcpy(buffer, s, s_len+1);
-    //     length = s_len;
-    //     return *this;
-    // }
-    // else
-    // {
-    //     expend(s_len+1);
-    //     memcpy(buffer, s, s_len+1);
-    //     length = s_len;
-    //     return *this;
-    // }
 }
 
 hstring & hstring::operator=(const int n)
