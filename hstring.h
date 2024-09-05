@@ -13,7 +13,7 @@ private:
     {
         char* new_buffer = new char[new_capacity];
         if (buffer) {
-            memcpy(new_buffer, buffer, length);
+            memcpy(new_buffer, buffer, length+1);
             delete[] buffer;
         }
         buffer = new_buffer;
